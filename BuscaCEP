@@ -1,0 +1,95 @@
+#include <stdio.h>
+#include <string.h>
+
+typedef struct _Endereco Endereco;
+
+//registroCEP = struct.Struct("72s72s72s72s2s8s2s");
+
+struct _Endereco
+{
+	char logradouro[72];
+	char bairro[72];
+	char cidade[72];
+	char uf[72];
+	char sigla[2];
+	char cep[8];
+	char lixo[2]; // Ao Espaço no final da linha + quebra de linha
+};
+
+int main(int argc, char**argv){
+	FILE *f;
+	Endereco e;
+	int qt;
+	int c;
+
+	/*if(argc != 2)
+	{
+		fprintf(stderr, "USO: %s [CEP]", argv[0]);
+		return 1;
+	}*/
+
+	c = 0;
+	printf("Tamanho da Estrutura: %ld\n\n", sizeof(Endereco));
+	f = fopen("cep_ordenado.dat","r");
+	//qt = fread(&e,sizeof(Endereco),1,f);
+	
+	int inicio = 0;
+	//char search[8];
+	int achei = 0;
+	int fim;
+	int tentativas = 0;
+
+	fseek(f, 0, SEEK_END);
+	fim = ftell(f);
+	fim = (fim/sizeof(Endereco)-1);
+
+	//printf("Digite o CEP: ");
+	//scanf("%d\n", &search);
+
+	while (inicio < fim ){
+		tentativas++;
+
+	int meio = (inicio+fim)/2;
+    fseek(f, meio * sizeof(Endereco), SEEK_SET);
+		fread(&e,sizeof(Endereco),1,f);
+		
+		
+		if(strncmp(argv[1], e.cep, 8) == 0){
+			achei = 1;
+			inicio = fim + 1;
+			printf("Achei o cep com %d tentativas \n", tentativas);
+            printf("%.72s\n%.72s\n%.72s\n%.72s\n%.2s\n%.8s\n",e.logradouro,e.bairro,e.cidade,e.uf,e.sigla,e.cep);
+		}else if(strncmp(argv[1], e.cep, 8) > 0){
+			
+			inicio = meio + 1;
+		}else if(strncmp(argv[1], e.cep, 8) < 0){
+			
+			fim = meio - 1;
+			
+		}
+	}
+
+	if(achei == 0){
+		printf("Nao achei o cep digitado. Percorri um total de %d tentativas", tentativas);
+	}
+	
+	
+	/* while(qt > 0)
+	{
+		c++;
+		// argv[1] < e.cep  => strcmp(argv[1],e.cep) < 0
+		// argv[1] > e.cep  => strcmp(argv[1],e.cep) > 0
+		// argv[1] == e.cep  => strcmp(argv[1],e.cep) == 0
+		e.logradouro[71] = '\0';
+		// pode usar o strstr
+		
+		if(strncmp(argv[1],e.cep,8)==0)
+		{
+			printf("%.72s\n%.72s\n%.72s\n%.72s\n%.2s\n%.8s\n",e.logradouro,e.bairro,e.cidade,e.uf,e.sigla,e.cep);
+			break;
+		}
+		qt = fread(&e,sizeof(Endereco),1,f);		
+	}
+	printf("Total Lido: %d\n", c); */
+	fclose(f);
+}
